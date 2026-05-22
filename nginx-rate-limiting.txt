@@ -1,0 +1,30 @@
+#If legitimate users also need to use that path, you cannot block it completely. Instead, use Nginx's limit_req module to restrict how many times an individual IP address can access that specific path per second.
+
+
+# 1. Define the zone in the 'http' block (Tracks IPs, allows 2 requests per second)
+http {
+    limit_req_zone $binary_remote_addr zone=ddos_protect:10m rate=2r/s;
+
+    server {
+        listen 80;
+        server_name yourdomain.com;
+
+        # 2. Apply the zone to the specific attacked path
+        location /attacked-path {
+            # burst=5 allows a brief spike of 5 requests before strictly enforcing the limit
+            # nodelay rejects excess requests instantly with a 503 error
+            limit_req zone=ddos_protect burst=5 nodelay;
+            
+            # Change default 503 error to 429 (Too Many Requests) if preferred
+            limit_req_status 429; 
+
+            proxy_pass http://your_backend;
+        }
+        
+        # All other paths remain unaffected
+        location / {
+            proxy_pass http://your_backend;
+        }
+    }
+}
+

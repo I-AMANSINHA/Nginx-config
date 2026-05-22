@@ -1,0 +1,7 @@
+After implementation
+use,
+- nginx -t (to reload the config. and check for syntax errors)
+- systemctl reload nginx (to apply the changes without taking the server down)
+
+
+- 

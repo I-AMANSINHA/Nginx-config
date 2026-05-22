@@ -1,0 +1,19 @@
+#best for suitable load
+
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    # Apply this ONLY to the specific URL path being flooded
+    location = /the-attacked-path {
+        # 444 tells Nginx to shut the door instantly without spending server resources
+        return 444; 
+    }
+
+    # Your normal configuration for the rest of the site
+    location / {
+        proxy_pass http://your_backend_server;
+        proxy_read_timeout 60s; 
+    }
+}
+

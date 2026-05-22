@@ -1,0 +1,19 @@
+##If attackers are hitting a specific URL path (e.g., /search, /login, or an expensive API endpoint) and you want to completely block access to it without processing the request, use a return 444 directive.
+
+#
+#
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    # Block a specific exact path
+    location = /attacked-path {
+        return 444;
+    }
+
+    # Block any path starting with a specific keyword
+    location /expensive-api/ {
+        return 444;
+    }
+}
+

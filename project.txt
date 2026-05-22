@@ -1,0 +1,51 @@
+# test for project specs
+# HTTP Server
+server {
+    listen 80;
+    server_name test.in;
+
+    access_log /project-folder/logs/access.log timed_combined ;
+    root /project-folder/current/public;
+    passenger_min_instances 5;
+    passenger_enabled on;
+    rails_env staging;
+
+    location / {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_set_header Host $http_host;
+    }
+
+    location ~* \.(ico|jpg|gif|png|css|js|swf|html)$ {
+        if (-f $request_filename) {
+            expires max;
+            break;
+        }
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+
+# HTTPS Server
+server {
+    listen 443 http2;
+    #ssl on;
+    server_name test.in;
+    ssl_certificate /opt/nginx/ssl/test.chained.crt;
+    ssl_certificate_key /opt/nginx/ssl/test.key;
+
+    access_log /project-folder/logs/access.log timed_combined;
+    root /project-folder/current/public;
+    passenger_enabled on;
+    rails_env staging;
+
+    autoindex on;
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+
